@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= guild.name %> - Pengaturan Enterprise</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    /* Apple macOS & iOS Ambient Glassmorphism Wallpaper */
+    body {
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: #080c14;
+      background-image: 
+        radial-gradient(circle at 12% 15%, rgba(99, 102, 241, 0.22) 0%, transparent 42%),
+        radial-gradient(circle at 88% 18%, rgba(217, 70, 239, 0.18) 0%, transparent 40%),
+        radial-gradient(circle at 50% 55%, rgba(56, 189, 248, 0.12) 0%, transparent 50%),
+        radial-gradient(circle at 82% 82%, rgba(139, 92, 246, 0.18) 0%, transparent 45%),
+        radial-gradient(circle at 18% 85%, rgba(16, 185, 129, 0.14) 0%, transparent 42%);
+      background-attachment: fixed;
+      background-size: cover;
+      color: #f1f5f9;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* macOS Frosted Menu Bar (Header) */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 1.1rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(11, 15, 25, 0.65);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    /* macOS & iOS Button System */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.65rem 1.35rem;
+      border-radius: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      font-size: 0.9rem;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.95), rgba(139, 92, 246, 0.9));
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 8px 24px rgba(99, 102, 241, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, rgba(79, 70, 229, 0.98), rgba(124, 58, 237, 0.95));
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(99, 102, 241, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    }
+    .btn-outline {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      color: #f1f5f9;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    }
+    .btn-outline:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    }
+
+    .container {
+      max-width: 1040px;
+      margin: 2.5rem auto;
+      padding: 0 1.5rem;
+      flex: 1;
+      width: 100%;
+    }
+
+    /* Floating Glass Header (Guild Profile) */
+    .guild-header {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+      padding: 1.6rem 2rem;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(18px) saturate(160%);
+      -webkit-backdrop-filter: blur(18px) saturate(160%);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 20px;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    }
+    .guild-avatar {
+      width: 76px;
+      height: 76px;
+      border-radius: 22px; /* Apple squircle */
+      object-fit: cover;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    /* iOS Segmented Control Tabs */
+    .tabs {
+      display: flex;
+      gap: 0.45rem;
+      margin-bottom: 2rem;
+      background: rgba(15, 23, 42, 0.55);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 0.4rem;
+      border-radius: 16px;
+      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.25);
+      overflow-x: auto;
+    }
+    .tab-btn {
+      background: transparent;
+      color: #94a3b8;
+      border: none;
+      padding: 0.75rem 1.3rem;
+      font-size: 0.92rem;
+      font-weight: 500;
+      cursor: pointer;
+      border-radius: 12px;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+    .tab-btn:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.06);
+    }
+    .tab-btn.active {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      color: #ffffff;
+      font-weight: 600;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* macOS / iOS Glass Cards */
+    .card, .glass-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(18px) saturate(160%);
+      -webkit-backdrop-filter: blur(18px) saturate(160%);
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      border-radius: 20px;
+      padding: 1.85rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+    }
+    .card:hover, .glass-card:hover {
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 1.15rem;
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      color: #ffffff;
+      letter-spacing: -0.2px;
+    }
+
+    /* Modern Frosted Inputs & Dropdowns */
+    .form-group { margin-bottom: 1.35rem; }
+    label {
+      display: block;
+      margin-bottom: 0.45rem;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: #cbd5e1;
+      letter-spacing: 0.15px;
+    }
+    input[type="text"], select, textarea {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.55);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 0.95rem;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    input[type="text"]:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: rgba(99, 102, 241, 0.7);
+      background: rgba(15, 23, 42, 0.8);
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.25), inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    select option {
+      background: #0f172a;
+      color: #ffffff;
+    }
+
+    /* iOS Slider Styling */
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 6px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.16);
+      outline: none;
+      transition: background 0.2s ease;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      cursor: pointer;
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      transition: transform 0.15s ease;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.18);
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    .checkbox-group input {
+      width: 19px;
+      height: 19px;
+      accent-color: #6366f1;
+      cursor: pointer;
+    }
+
+    /* iOS Dynamic Island / Capsule Toast */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      padding: 0.85rem 1.65rem;
+      border-radius: 9999px;
+      background: rgba(16, 185, 129, 0.88);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+      font-weight: 600;
+      display: none;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      z-index: 1000;
+      animation: floatIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes floatIn {
+      from { transform: translateY(12px) scale(0.96); opacity: 0; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    /* Glass Table */
+    table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 1rem; }
+    th {
+      background: rgba(255, 255, 255, 0.04);
+      color: #94a3b8;
+      font-weight: 600;
+      padding: 0.85rem 1rem;
+      text-align: left;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    th:first-child { border-top-left-radius: 12px; }
+    th:last-child { border-top-right-radius: 12px; }
+    td {
+      padding: 0.85rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 0.9rem;
+      color: #e2e8f0;
+    }
+    tbody tr {
+      transition: background 0.2s ease;
+    }
+    tbody tr:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .hidden { display: none !important; }
+
+    /* Apple-Style Glass Music Deck */
+    .music-container-card {
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 20px;
+      padding: 1.85rem;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+    }
+    .player-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      padding: 0.7rem 1.25rem;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      color: #f1f5f9;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .player-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateY(-2px);
+      border-color: rgba(255, 255, 255, 0.3);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    }
+    .player-btn-primary {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.95), rgba(139, 92, 246, 0.9));
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
+    .player-btn-primary:hover {
+      background: linear-gradient(135deg, rgba(79, 70, 229, 0.98), rgba(124, 58, 237, 0.95));
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(99, 102, 241, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    }
+    .player-btn-danger {
+      background: rgba(239, 68, 68, 0.18);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .player-btn-danger:hover {
+      background: rgba(239, 68, 68, 0.3);
+      color: #fecaca;
+      transform: translateY(-2px);
+    }
+    .queue-row {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 12px;
+      padding: 0.65rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .queue-row:hover {
+      background: rgba(255, 255, 255, 0.09);
+      border-color: rgba(255, 255, 255, 0.18);
+      transform: translateX(3px);
+    }
+
+    /* Real-Time Live Badges & Animations */
+    @keyframes pulseLive {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+    }
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #22c55e;
+      display: inline-block;
+      animation: pulseLive 2s infinite;
+    }
+    @keyframes highlightRow {
+      0% { background: rgba(88, 101, 242, 0.35); }
+      100% { background: transparent; }
+    }
+    .new-case-row {
+      animation: highlightRow 3.5s ease-out;
+    }
+    .badge-action {
+      display: inline-block;
+      padding: 0.25rem 0.6rem;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .badge-ban { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
+    .badge-kick { background: rgba(249, 115, 22, 0.2); color: #fb923c; border: 1px solid rgba(249, 115, 22, 0.4); }
+    .badge-timeout { background: rgba(234, 179, 8, 0.2); color: #fde047; border: 1px solid rgba(234, 179, 8, 0.4); }
+    .badge-mute { background: rgba(234, 179, 8, 0.2); color: #fde047; border: 1px solid rgba(234, 179, 8, 0.4); }
+    .badge-warn { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
+    .badge-unban { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.4); }
+
+    /* Soundwave Equalizer Animation */
+    .music-equalizer {
+      display: inline-flex;
+      gap: 3px;
+      align-items: flex-end;
+      height: 16px;
+      vertical-align: middle;
+      margin-left: 0.35rem;
+    }
+    .music-bar {
+      width: 3px;
+      background: #818cf8;
+      border-radius: 2px;
+      animation: barJump 1.2s ease-in-out infinite alternate;
+    }
+    .music-bar:nth-child(1) { height: 6px; animation-duration: 0.8s; }
+    .music-bar:nth-child(2) { height: 14px; animation-duration: 1.1s; animation-delay: 0.2s; }
+    .music-bar:nth-child(3) { height: 8px; animation-duration: 0.9s; animation-delay: 0.4s; }
+    .music-bar:nth-child(4) { height: 16px; animation-duration: 1.3s; animation-delay: 0.1s; }
+    @keyframes barJump {
+      0% { height: 4px; }
+      100% { height: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div style="font-size: 1.25rem; font-weight: 700; color: #818cf8; display: flex; align-items: center; gap: 0.6rem;">
+      <i class="fa-solid fa-shield-halved"></i> Panel Konfigurasi Server
+    </div>
+    <div>
+      <a href="/guilds" class="btn btn-outline" style="margin-right: 0.5rem;"><i class="fa-solid fa-arrow-left"></i> Kembali ke Server</a>
+      <a href="/auth/logout" class="btn btn-outline"><i class="fa-solid fa-arrow-right-from-bracket"></i> Keluar</a>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="guild-header">
+      <img class="guild-avatar" src="<%= guild.iconUrl %>" alt="<%= guild.name %>" />
+      <div>
+        <h2 style="font-size: 1.8rem;"><%= guild.name %></h2>
+        <p style="color: #94a3b8; font-size: 0.9rem;">ID: <%= guild.id %> • <%= guild.memberCount %> Anggota</p>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('tab-moderation')"><i class="fa-solid fa-shield-halved"></i> Moderasi & Audit</button>
+      <button class="tab-btn" onclick="switchTab('tab-welcome')"><i class="fa-solid fa-door-open"></i> Masuk & Keluar (Datang-Pergi)</button>
+      <button class="tab-btn" onclick="switchTab('tab-music')"><i class="fa-solid fa-music"></i> Musik & Player</button>
+      <button class="tab-btn" onclick="switchTab('tab-leveling')"><i class="fa-solid fa-star"></i> Leveling & XP</button>
+      <button class="tab-btn" onclick="switchTab('tab-logs')"><i class="fa-solid fa-clock-rotate-left"></i> Riwayat Kasus</button>
+    </div>
+
+    <form id="settingsForm">
+      <!-- 1. Moderation Settings -->
+      <div id="tab-moderation" class="tab-content active">
+        <div class="card">
+          <div class="card-title"><i class="fa-solid fa-shield-halved" style="color: #818cf8;"></i> Konfigurasi Saluran & Peran Moderasi</div>
+
+          <div class="form-group">
+            <label>Saluran ModLog (Audit Log)</label>
+            <select name="modLogChannelId">
+              <option value="">-- Pilih Saluran --</option>
+              <% channels.forEach(function(c) { %>
+                <option value="<%= c.id %>" <%= config.modLogChannelId === c.id ? 'selected' : '' %>># <%= c.name %></option>
+              <% }); %>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Peran Moderator</label>
+            <select name="modRoleId">
+              <option value="">-- Pilih Peran Moderator --</option>
+              <% roles.forEach(function(r) { %>
+                <option value="<%= r.id %>" <%= config.modRoleId === r.id ? 'selected' : '' %>>@<%= r.name %></option>
+              <% }); %>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Peran Administrator</label>
+            <select name="adminRoleId">
+              <option value="">-- Pilih Peran Administrator --</option>
+              <% roles.forEach(function(r) { %>
+                <option value="<%= r.id %>" <%= config.adminRoleId === r.id ? 'selected' : '' %>>@<%= r.name %></option>
+              <% }); %>
+            </select>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><i class="fa-solid fa-bolt" style="color: #fbbf24;"></i> Keamanan Otomatis (Automod)</div>
+
+          <div class="checkbox-group">
+            <input type="checkbox" id="antiSpamEnabled" name="antiSpamEnabled" <%= config.antiSpamEnabled ? 'checked' : '' %> />
+            <label for="antiSpamEnabled">Aktifkan Anti-Spam (Deteksi Flood Pesan)</label>
+          </div>
+
+          <div class="checkbox-group">
+            <input type="checkbox" id="antiRaidEnabled" name="antiRaidEnabled" <%= config.antiRaidEnabled ? 'checked' : '' %> />
+            <label for="antiRaidEnabled">Aktifkan Anti-Raid (Deteksi Lonjakan Anggota Baru)</label>
+          </div>
+
+          <div class="checkbox-group">
+            <input type="checkbox" id="filterLinksEnabled" name="filterLinksEnabled" <%= config.filterLinksEnabled ? 'checked' : '' %> />
+            <label for="filterLinksEnabled">Blokir Tautan Undangan Discord Tidak Berizin</label>
+          </div>
+        </div>
+
+        <div class="card" style="border: 1px solid rgba(239, 68, 68, 0.35); background: rgba(239, 68, 68, 0.06); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: 0 10px 32px rgba(239, 68, 68, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.15);">
+          <div class="card-title" style="color: #f87171;">
+            <i class="fa-solid fa-triangle-exclamation"></i> Perangkap Anti-Spam Hack (Honeypot Channel)
+          </div>
+          <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 1rem; line-height: 1.5;">
+            Melindungi server dari serangan <strong>bot spam, scam Nitro/Steam, dan akun Discord yang terkena hack/token stealer</strong>.
+            Jika ada anggota biasa yang mengirim pesan di saluran yang dipilih, bot akan <strong>langsung menghapus pesan dan me-kick pengguna tersebut secara otomatis</strong> (Staff & Admin otomatis dikecualikan).
+          </p>
+
+          <div class="checkbox-group">
+            <input type="checkbox" id="antiSpamTrapEnabled" name="antiSpamTrapEnabled" <%= config.antiSpamTrapEnabled ? 'checked' : '' %> />
+            <label for="antiSpamTrapEnabled" style="color: #f87171; font-weight: 600;">Aktifkan Saluran Perangkap (Langsung Kick Otomatis)</label>
+          </div>
+
+          <div class="form-group">
+            <label>Pilih Saluran Perangkap (Honeypot Channel)</label>
+            <select name="antiSpamTrapChannelId" id="antiSpamTrapChannelId" onchange="if(this.value) { document.getElementById('antiSpamTrapEnabled').checked = true; }">
+              <option value="">-- Nonaktifkan / Belum Dipilih --</option>
+              <% channels.forEach(function(c) { %>
+                <option value="<%= c.id %>" <%= config.antiSpamTrapChannelId === c.id ? 'selected' : '' %>># <%= c.name %></option>
+              <% }); %>
+            </select>
+            <small style="color: #64748b; display: block; margin-top: 0.4rem;">
+              <i class="fa-regular fa-lightbulb" style="color: #fbbf24;"></i> <em>Rekomendasi: Buat saluran khusus (misal: <code>#saluran-terlarang</code> atau <code>#perangkap-bot</code>) yang terlihat oleh publik, tetapi dilarang bagi siapa pun untuk mengetik di sana.</em>
+            </small>
+          </div>
+
+          <div class="form-group" style="margin-top: 1rem;">
+            <label>Isi Pesan Peringatan Saluran</label>
+            <textarea name="antiSpamTrapMessage" id="antiSpamTrapMessage" rows="3" placeholder="jangan kirim pesan kesini karna ini canel khusus"><%= config.antiSpamTrapMessage || 'jangan kirim pesan kesini karna ini canel khusus! Siapa pun (selain Admin) yang mengirim pesan di saluran ini akan langsung di-KICK otomatis oleh sistem anti-spam.' %></textarea>
+            <small style="color: #64748b; display: block; margin-top: 0.35rem;">
+              Bot akan mengirimkan pesan peringatan resmi ini ke saluran agar anggota tahu dan tidak sengaja mengetik di sana.
+            </small>
+          </div>
+
+          <div style="display: flex; gap: 0.75rem; align-items: center; margin-top: 1rem; flex-wrap: wrap;">
+            <button type="button" class="btn btn-outline" onclick="sendTrapNotice()" style="border-color: #ef4444; color: #f87171;">
+              <i class="fa-solid fa-bullhorn"></i> Kirim Pesan Peringatan Sekarang ke Saluran
+            </button>
+            <div class="checkbox-group" style="margin-bottom: 0;">
+              <input type="checkbox" id="autoSendTrapNotice" name="autoSendTrapNotice" checked />
+              <label for="autoSendTrapNotice" style="font-size: 0.85rem; color: #94a3b8;">Kirim ulang otomatis saat Simpan Pengaturan</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Welcome & Goodbye (Masuk & Keluar) Settings -->
+      <div id="tab-welcome" class="tab-content">
+        <div class="card">
+          <div class="card-title"><i class="fa-solid fa-door-open" style="color: #818cf8;"></i> Saluran Datang & Pergi (Pesan Masuk & Keluar)</div>
+          <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 1.25rem;">
+            Menggabungkan pengumuman <strong>Anggota Masuk (Datang)</strong> dan <strong>Anggota Keluar (Pergi)</strong> ke dalam satu saluran server yang sama secara rapi.
+          </p>
+
+          <div class="form-group">
+            <label>Saluran Masuk & Keluar (Datang-Pergi)</label>
+            <select name="welcomeChannelId" id="welcomeChannelId" onchange="if(this.value) { document.getElementById('welcomeEnabled').checked = true; document.getElementById('goodbyeEnabled').checked = true; }">
+              <option value="">-- Pilih Saluran --</option>
+              <% channels.forEach(function(c) { %>
+                <option value="<%= c.id %>" <%= config.welcomeConfig?.channelId === c.id ? 'selected' : '' %>># <%= c.name %></option>
+              <% }); %>
+            </select>
+          </div>
+
+          <!-- Section A: Pesan Masuk (Sambutan) -->
+          <div style="background: rgba(99, 102, 241, 0.08); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid rgba(99, 102, 241, 0.25); border-radius: 16px; padding: 1.25rem; margin-bottom: 1.25rem; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);">
+            <div class="checkbox-group" style="margin-bottom: 0.75rem;">
+              <input type="checkbox" id="welcomeEnabled" name="welcomeEnabled" <%= config.welcomeConfig?.enabled ? 'checked' : '' %> />
+              <label for="welcomeEnabled" style="font-weight: 600; color: #818cf8;"><i class="fa-solid fa-circle-check" style="color: #4ade80;"></i> Aktifkan Pesan Masuk (Sambutan Anggota Baru)</label>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label>Pesan Sambutan (Mendukung {user}, {username}, {server}, {memberCount})</label>
+              <textarea name="welcomeMessage" rows="3"><%= config.welcomeConfig?.message || 'Selamat datang di {server}, {user}! Anda adalah anggota ke-{memberCount}.' %></textarea>
+            </div>
+          </div>
+
+          <!-- Section B: Pesan Keluar (Perpisahan) -->
+          <div style="background: rgba(245, 158, 11, 0.08); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 16px; padding: 1.25rem; margin-bottom: 1.25rem; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);">
+            <div class="checkbox-group" style="margin-bottom: 0.75rem;">
+              <input type="checkbox" id="goodbyeEnabled" name="goodbyeEnabled" <%= config.welcomeConfig?.goodbyeEnabled ? 'checked' : '' %> />
+              <label for="goodbyeEnabled" style="font-weight: 600; color: #fbbf24;"><i class="fa-solid fa-circle-xmark" style="color: #fb923c;"></i> Aktifkan Pesan Keluar (Anggota Meninggalkan Server)</label>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label>Pesan Keluar (Mendukung {user}, {username}, {server}, {memberCount})</label>
+              <textarea name="goodbyeMessage" rows="3"><%= config.welcomeConfig?.goodbyeMessage || '{username} telah meninggalkan server {server}. Sekarang tersisa {memberCount} anggota.' %></textarea>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Peran Otomatis (Auto Role saat anggota bergabung)</label>
+            <select name="autoRoleId">
+              <option value="">-- Tanpa Auto Role --</option>
+              <% roles.forEach(function(r) { %>
+                <option value="<%= r.id %>" <%= config.welcomeConfig?.autoRoleId === r.id ? 'selected' : '' %>>@<%= r.name %></option>
+              <% }); %>
+            </select>
+          </div>
+
+          <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.08); display: flex; gap: 1rem; flex-wrap: wrap;">
+            <button type="button" class="btn btn-outline" onclick="testWelcome()" style="border-color: #38bdf8; color: #38bdf8; flex: 1; padding: 0.75rem;">
+              <i class="fa-solid fa-flask"></i> Uji Coba Pesan Masuk (Datang)
+            </button>
+            <button type="button" class="btn btn-outline" onclick="testGoodbye()" style="border-color: #f59e0b; color: #fbbf24; flex: 1; padding: 0.75rem;">
+              <i class="fa-solid fa-flask"></i> Uji Coba Pesan Keluar (Pergi)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Leveling Settings -->
+      <div id="tab-leveling" class="tab-content">
+        <div class="card">
+          <div class="card-title"><i class="fa-solid fa-star" style="color: #facc15;"></i> Sistem Leveling & XP</div>
+
+          <div class="checkbox-group">
+            <input type="checkbox" id="levelingEnabled" name="levelingEnabled" <%= config.levelConfig?.enabled ? 'checked' : '' %> />
+            <label for="levelingEnabled">Aktifkan Perolehan XP & Level</label>
+          </div>
+
+          <div class="form-group">
+            <label>Pengali Laju XP (XP Rate Multiplier)</label>
+            <input type="text" name="xpRate" value="<%= config.levelConfig?.xpRate || '1.0' %>" placeholder="1.0" />
+          </div>
+        </div>
+      </div>
+
+      <!-- 3.5. Music Settings & Player -->
+      <div id="tab-music" class="tab-content">
+        <!-- 1. Web Music Search & Play Bar -->
+        <div class="music-container-card" style="border-color: rgba(99, 102, 241, 0.35);">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+            <div style="font-size: 1.15rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 0.5rem;">
+              <span><i class="fa-solid fa-magnifying-glass" style="color: #818cf8;"></i> Putar & Ganti Lagu Langsung</span>
+              <span style="font-size: 0.75rem; background: rgba(99, 102, 241, 0.25); color: #a5b4fc; padding: 0.15rem 0.55rem; border-radius: 6px; font-weight: 700;">Web Controller</span>
+            </div>
+            <div style="font-size: 0.85rem; color: #94a3b8;">
+              Putar lagu ke saluran suara Discord langsung dari browser!
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <!-- Voice Channel Selector -->
+            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+              <label style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 0; white-space: nowrap;">Saluran Suara:</label>
+              <div style="flex: 1; min-width: 220px;">
+                <select id="webVoiceChannelId" style="background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; font-size: 0.9rem; padding: 0.65rem 0.95rem; color: #fff;">
+                  <option value="">(Otomatis) Ikuti Voice Channel saya</option>
+                  <% (typeof voiceChannels !== 'undefined' && voiceChannels ? voiceChannels : []).forEach(function(vc) { %>
+                    <option value="<%= vc.id %>"># <%= vc.name %> (<%= vc.memberCount %> orang di dalam)</option>
+                  <% }); %>
+                </select>
+              </div>
+            </div>
+
+            <!-- Search Query & Button -->
+            <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
+              <input 
+                type="text" 
+                id="webSongQuery" 
+                placeholder="Ketik judul lagu atau link YouTube (contoh: Hindia - Evaluasi, lofi hip hop, dll)..." 
+                style="flex: 1; min-width: 250px; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; font-size: 0.95rem; padding: 0.75rem 1rem; color: #fff;" 
+                onkeydown="if(event.key === 'Enter') { event.preventDefault(); playFromWeb(); }"
+              />
+              <button type="button" class="player-btn player-btn-primary" onclick="playFromWeb()" style="padding: 0.75rem 1.6rem; white-space: nowrap; font-size: 0.95rem;">
+                <i class="fa-solid fa-play"></i> Putar Lagu
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Live Music Controller Deck (Now Playing) -->
+        <div class="music-container-card">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.5rem;">
+            <div style="font-size: 1.15rem; font-weight: 700; color: #818cf8; display: flex; align-items: center; gap: 0.5rem;">
+              <span><i class="fa-solid fa-sliders" style="color: #818cf8;"></i> Sedang Diputar (Live Player)</span>
+            </div>
+            <span id="musicLiveBadge" style="font-size: 0.8rem; background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); padding: 0.2rem 0.65rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.4rem;">
+              <span class="live-dot"></span> Real-Time Aktif
+            </span>
+          </div>
+
+          <div id="livePlayerBox">
+            <!-- Idle / Sleep State -->
+            <div id="noMusicPlaying" style="padding: 2.5rem 1rem; color: #94a3b8; text-align: center;">
+              <div style="font-size: 2.8rem; margin-bottom: 0.65rem; color: #64748b;">
+                <i class="fa-solid fa-compact-disc fa-spin" style="--fa-animation-duration: 8s;"></i>
+              </div>
+              <div style="font-size: 1.1rem; font-weight: 700; color: #e2e8f0;">Saat ini belum ada lagu yang diputar.</div>
+              <p style="font-size: 0.85rem; margin-top: 0.35rem; color: #64748b;">
+                Pilih lagu pada kolom di atas lalu klik <strong>Putar Lagu</strong>, atau ketik <code>/play</code> di Discord!
+              </p>
+            </div>
+
+            <!-- Active Song Playing State -->
+            <div id="activeMusicPlaying" style="display: none;">
+              <div style="display: flex; gap: 1.25rem; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap;">
+                <div>
+                  <img id="musicThumb" src="" alt="Cover" style="width: 96px; height: 96px; object-fit: cover; border-radius: 16px; box-shadow: 0 10px 28px rgba(0,0,0,0.55); border: 2px solid rgba(255,255,255,0.18);" />
+                </div>
+                <div style="flex: 1; min-width: 240px;">
+                  <div style="display: flex; align-items: center; gap: 0.55rem; flex-wrap: wrap;">
+                    <span id="playingStatusBadge" style="font-size: 0.75rem; padding: 0.25rem 0.6rem; border-radius: 8px; background: rgba(99, 102, 241, 0.25); color: #c7d2fe; font-weight: 700; border: 1px solid rgba(99, 102, 241, 0.35); display: inline-flex; align-items: center; gap: 0.35rem;">
+                      <i class="fa-solid fa-play"></i> MEMUTAR
+                    </span>
+                    <span id="equalizerBox" class="music-equalizer">
+                      <span class="music-bar"></span>
+                      <span class="music-bar"></span>
+                      <span class="music-bar"></span>
+                      <span class="music-bar"></span>
+                    </span>
+                  </div>
+                  <div id="musicTitle" style="font-size: 1.25rem; font-weight: 700; color: #fff; margin-top: 0.4rem; line-height: 1.4;"></div>
+                  <div id="musicMeta" style="color: #94a3b8; font-size: 0.85rem; margin-top: 0.35rem;"></div>
+
+                  <!-- Live Volume Control -->
+                  <div style="display: flex; align-items: center; gap: 0.65rem; margin-top: 0.75rem; max-width: 290px; background: rgba(15, 23, 42, 0.55); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); padding: 0.45rem 0.85rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); box-shadow: inset 0 1px 2px rgba(0,0,0,0.2);">
+                    <span style="font-size: 0.9rem; color: #94a3b8;"><i class="fa-solid fa-volume-high"></i></span>
+                    <input type="range" id="liveVolumeSlider" min="0" max="100" value="80" style="flex: 1; accent-color: #818cf8; cursor: pointer;" onchange="changeLiveVolume(this.value)" oninput="document.getElementById('liveVolumeText').innerText = this.value + '%'" />
+                    <span id="liveVolumeText" style="font-size: 0.85rem; color: #a5b4fc; font-weight: 700; min-width: 38px;">80%</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Deck Buttons -->
+              <div style="display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center; padding-top: 0.85rem; border-top: 1px solid rgba(255,255,255,0.08);">
+                <button type="button" id="btnPauseResume" class="player-btn player-btn-primary" onclick="togglePauseResume()">
+                  <i class="fa-solid fa-pause"></i> Jeda
+                </button>
+                <button type="button" class="player-btn" onclick="controlMusic('skip')">
+                  <i class="fa-solid fa-forward-step"></i> Lewati Lagu
+                </button>
+                <button type="button" id="btnLoopToggle" class="player-btn" onclick="controlMusic('loop')">
+                  <i class="fa-solid fa-repeat"></i> Loop: OFF
+                </button>
+                <button type="button" class="player-btn player-btn-danger" onclick="controlMusic('stop')">
+                  <i class="fa-solid fa-stop"></i> Berhenti
+                </button>
+              </div>
+
+              <!-- Live Queue List -->
+              <div id="liveQueueSection" style="margin-top: 1.5rem; display: none; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.08);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                  <div style="font-size: 0.95rem; font-weight: 700; color: #cbd5e1; display: flex; align-items: center; gap: 0.45rem;">
+                    <span><i class="fa-solid fa-list-ol" style="color: #818cf8;"></i> Antrean Lagu Berikutnya</span>
+                    <span style="font-size: 0.75rem; background: rgba(99, 102, 241, 0.25); color: #818cf8; padding: 0.15rem 0.5rem; border-radius: 4px; font-weight: 700;" id="queueCount">0</span>
+                  </div>
+                  <button type="button" onclick="controlMusic('clearQueue')" style="background: transparent; border: none; color: #f87171; font-size: 0.8rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem; text-decoration: underline;">
+                    <i class="fa-solid fa-trash-can"></i> Kosongkan Antrean
+                  </button>
+                </div>
+                <div id="queueList" style="display: flex; flex-direction: column; gap: 0.5rem; max-height: 220px; overflow-y: auto;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Music Settings Configuration -->
+        <div class="card">
+          <div class="card-title"><i class="fa-solid fa-gear" style="color: #818cf8;"></i> Konfigurasi Standar Musik</div>
+          <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 1.25rem;">
+            Kelola izin, saluran teks khusus, dan volume default untuk server ini.
+          </p>
+
+          <div class="form-group">
+            <label>Saluran Khusus Perintah Musik</label>
+            <select name="musicChannelId">
+              <option value="">-- Bebas di Semua Saluran Teks --</option>
+              <% channels.forEach(function(c) { %>
+                <option value="<%= c.id %>" <%= config.musicChannelId === c.id ? 'selected' : '' %>># <%= c.name %></option>
+              <% }); %>
+            </select>
+            <small style="color: #64748b; display: block; margin-top: 0.35rem;">Jika dipilih, perintah musik seperti <code>/play</code> hanya dapat digunakan di saluran tersebut.</small>
+          </div>
+
+          <div class="form-group">
+            <label>Peran DJ (DJ Role)</label>
+            <select name="musicDjRoleId">
+              <option value="">-- Semua Anggota Diizinkan --</option>
+              <% roles.forEach(function(r) { %>
+                <option value="<%= r.id %>" <%= config.musicDjRoleId === r.id ? 'selected' : '' %>>@<%= r.name %></option>
+              <% }); %>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Volume Standar: <span id="volVal" style="color: #5865F2; font-weight: 700;"><%= config.musicDefaultVolume || 80 %>%</span></label>
+            <input type="range" name="musicDefaultVolume" id="musicDefaultVolume" min="0" max="100" value="<%= config.musicDefaultVolume || 80 %>" oninput="document.getElementById('volVal').innerText = this.value + '%'" style="width: 100%; accent-color: #5865F2;" />
+          </div>
+
+          <div class="checkbox-group">
+            <input type="checkbox" id="musicAutoLeave" name="musicAutoLeave" <%= config.musicAutoLeave ? 'checked' : '' %> />
+            <label for="musicAutoLeave">Keluar Otomatis saat Saluran Suara Sepi / Lagu Habis</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Recent Logs Tab -->
+      <div id="tab-logs" class="tab-content">
+        <div class="card">
+          <div class="card-title" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+            <span><i class="fa-solid fa-clock-rotate-left" style="color: #818cf8;"></i> Kasus Tindakan Moderasi Terakhir</span>
+            <span id="logsLiveBadge" style="font-size: 0.8rem; background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); padding: 0.2rem 0.65rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.4rem;">
+              <span class="live-dot"></span> Real-Time Stream
+            </span>
+          </div>
+          <% const safeCases = (typeof recentCases !== 'undefined' && Array.isArray(recentCases)) ? recentCases : []; %>
+          <% const hasLogs = Boolean(safeCases.length); %>
+          <div id="noLogsMsg" class="<%= hasLogs ? 'hidden' : '' %>" style="color: #94a3b8; padding: 1.5rem 0; text-align: center;">
+            Belum ada kasus tindakan moderasi yang tercatat. Saat ada tindakan kick, ban, mute, atau warn, akan langsung muncul di sini secara otomatis tanpa perlu refresh!
+          </div>
+          <div id="logsTableContainer" class="<%= hasLogs ? '' : 'hidden' %>" style="overflow-x: auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Kasus</th>
+                  <th>Tindakan</th>
+                  <th>Target</th>
+                  <th>Moderator</th>
+                  <th>Alasan</th>
+                  <th>Waktu</th>
+                </tr>
+              </thead>
+              <tbody id="logsTableBody">
+                <% if (safeCases.length > 0) { %>
+                  <% safeCases.forEach(function(c) { %>
+                    <tr id="case-row-<%= c.caseNumber %>">
+                      <td>#<%= c.caseNumber %></td>
+                      <td>
+                        <span class="badge-action badge-<%= (c.action || '').toLowerCase() %>"><%= c.action %></span>
+                      </td>
+                      <td><strong><%= c.targetTag || c.targetId %></strong></td>
+                      <td><%= c.moderatorTag || c.moderatorId %></td>
+                      <td><%= c.reason %></td>
+                      <td><%= new Date(c.createdAt).toLocaleDateString('id-ID') %> <%= new Date(c.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) %></td>
+                    </tr>
+                  <% }); %>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 1.5rem; display: flex; justify-content: flex-end;">
+        <button type="submit" class="btn btn-primary" style="padding: 0.85rem 2rem; font-size: 1rem;"><i class="fa-solid fa-floppy-disk"></i> Simpan Seluruh Pengaturan</button>
+      </div>
+    </form>
+  </div>
+
+  <div id="toast" class="toast"><i class="fa-solid fa-circle-check"></i> Pengaturan berhasil diperbarui!</div>
+
+  <script>
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    document.getElementById('settingsForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const data = {
+        modLogChannelId: form.modLogChannelId.value || null,
+        modRoleId: form.modRoleId.value || null,
+        adminRoleId: form.adminRoleId.value || null,
+        antiSpamEnabled: form.antiSpamEnabled ? form.antiSpamEnabled.checked : true,
+        antiRaidEnabled: form.antiRaidEnabled ? form.antiRaidEnabled.checked : false,
+        filterLinksEnabled: form.filterLinksEnabled ? form.filterLinksEnabled.checked : false,
+        antiSpamTrapEnabled: form.antiSpamTrapEnabled ? form.antiSpamTrapEnabled.checked : false,
+        antiSpamTrapChannelId: form.antiSpamTrapChannelId ? form.antiSpamTrapChannelId.value : null,
+        antiSpamTrapMessage: form.antiSpamTrapMessage ? form.antiSpamTrapMessage.value : null,
+        autoSendTrapNotice: form.autoSendTrapNotice ? form.autoSendTrapNotice.checked : false,
+        welcomeEnabled: form.welcomeEnabled ? form.welcomeEnabled.checked : false,
+        welcomeChannelId: form.welcomeChannelId.value || null,
+        welcomeMessage: form.welcomeMessage.value || null,
+        goodbyeEnabled: form.goodbyeEnabled ? form.goodbyeEnabled.checked : false,
+        goodbyeMessage: form.goodbyeMessage.value || null,
+        autoRoleId: form.autoRoleId.value || null,
+        levelingEnabled: form.levelingEnabled ? form.levelingEnabled.checked : true,
+        xpRate: parseFloat(form.xpRate.value) || 1.0,
+        musicDefaultVolume: parseInt(form.musicDefaultVolume.value) || 80,
+        musicChannelId: form.musicChannelId.value || null,
+        musicDjRoleId: form.musicDjRoleId.value || null,
+        musicAutoLeave: form.musicAutoLeave ? form.musicAutoLeave.checked : true,
+      };
+
+      try {
+        const res = await fetch('/api/guilds/<%= guild.id %>/settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        const json = await res.json();
+        if (json.success) {
+          showToast('<i class="fa-solid fa-circle-check"></i> ' + json.message);
+        } else {
+          showToast('<i class="fa-solid fa-circle-xmark"></i> Gagal memperbarui: ' + JSON.stringify(json.errors || json.message));
+        }
+      } catch (err) {
+        showToast('<i class="fa-solid fa-circle-xmark"></i> Kesalahan jaringan saat menyimpan.');
+      }
+    });
+
+    async function testWelcome() {
+      showToast('<i class="fa-solid fa-spinner fa-spin"></i> Mengirim pesan uji coba ke saluran...');
+      try {
+        const res = await fetch('/api/guilds/<%= guild.id %>/test-welcome', { method: 'POST' });
+        const json = await res.json();
+        if (json.success) {
+          showToast('<i class="fa-solid fa-circle-check"></i> ' + json.message);
+        } else {
+          showToast('<i class="fa-solid fa-circle-xmark"></i> ' + (json.message || 'Gagal mengirim'));
+        }
+      } catch (err) {
+        showToast('<i class="fa-solid fa-circle-xmark"></i> Gagal menghubungi server dashboard.');
+      }
+    }
+
+    async function testGoodbye() {
+      showToast('<i class="fa-solid fa-spinner fa-spin"></i> Mengirim pesan uji coba perpisahan ke saluran...');
+      try {
+        const res = await fetch('/api/guilds/<%= guild.id %>/test-goodbye', { method: 'POST' });
+        const json = await res.json();
+        if (json.success) {
+          showToast('<i class="fa-solid fa-circle-check"></i> ' + json.message);
+        } else {
+          showToast('<i class="fa-solid fa-circle-xmark"></i> ' + (json.message || 'Gagal mengirim'));
+        }
+      } catch (err) {
+        showToast('<i class="fa-solid fa-circle-xmark"></i> Gagal menghubungi server dashboard.');
+      }
+    }
+
+    async function sendTrapNotice() {
+      const channelId = document.getElementById('antiSpamTrapChannelId').value;
+      const message = document.getElementById('antiSpamTrapMessage').value;
+      if (!channelId) {
+        showToast('<i class="fa-solid fa-triangle-exclamation"></i> Silakan pilih Saluran Perangkap terlebih dahulu!');
+        return;
+      }
+      showToast('<i class="fa-solid fa-spinner fa-spin"></i> Mengirim pesan peringatan ke saluran...');
+      try {
+        const res = await fetch('/api/guilds/<%= guild.id %>/send-trap-notice', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ channelId, message })
+        });
+        const json = await res.json();
+        if (json.success) {
+          showToast('<i class="fa-solid fa-circle-check"></i> ' + json.message);
+        } else {
+          showToast('<i class="fa-solid fa-circle-xmark"></i> ' + (json.message || 'Gagal mengirim'));
+        }
+      } catch (err) {
+        showToast('<i class="fa-solid fa-circle-xmark"></i> Gagal menghubungi server dashboard.');
+      }
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.innerHTML = msg;
+      toast.style.display = 'inline-flex';
+      toast.style.alignItems = 'center';
+      toast.style.gap = '0.55rem';
+      setTimeout(() => { toast.style.display = 'none'; }, 3500);
+    }
+
+    async function controlMusic(action) {
+      showToast('<i class="fa-solid fa-spinner fa-spin"></i> Memproses aksi musik...');
+      try {
+        const res = await fetch('/api/guilds/<%= guild.id %>/music/control', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action })
+        });
+        const json = await res.json();
+        if (json.success) {
+          showToast('<i class="fa-solid fa-circle-check"></i> ' + json.message);
+          updateMusicUI(json);
+        } else {
+          showToast('<i class="fa-solid fa-circle-xmark"></i> ' + (json.message || 'Gagal'));
+        }
+      } catch (err) {
+        showToast('<i class="fa-solid fa-circle-xmark"></i> Gagal menghubungi server dashboard.');
+      }
+    }
+
+        // Play track directly from Web Dashboard
+    async function playFromWeb() {
+      const input = document.getElementById('webSongQuery');
+      const query = input.value.trim();
+      const voiceChannelSelect = document.getElementById('webVoiceChannelId');
+      const voiceChannelId = voiceChannelSelect ? voiceChannelSelect.value : null;
+
+      if (!query) {
+        showToast('<i class="fa-solid fa-triangle-exclamation"></i> Silakan ketik judul lagu atau link YouTube!');
+        input.focus();
+        return;
+      }
+
+      showToast('<i class="fa-solid fa-spinner fa-spin"></i> Memproses lagu: ' + query + '...');
+      try {
+        const res = await fetch('/api/guilds/' + guildId + '/music/control', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'play', query, voiceChannelId })
+        });
+        const json = await res.json();
+        if (json.success) {
+          showToast('<i class="fa-solid fa-music"></i> ' + json.message);
+          input.value = '';
+          updateMusicUI(json);
+        } else {
+          showToast('<i class="fa-solid fa-circle-xmark"></i> ' + (json.message || 'Gagal memutar lagu'));
+        }
+      } catch (err) {
+        showToast('<i class="fa-solid fa-circle-xmark"></i> Gagal menghubungi server pemutar musik.');
+      }
+    }
+
+    let isSongPaused = false;
+    function togglePauseResume() {
+      if (isSongPaused) {
+        controlMusic('resume');
+      } else {
+        controlMusic('pause');
+      }
+    }
+
+    async function removeQueueItem(idx) {
+      showToast('<i class="fa-solid fa-spinner fa-spin"></i> Menghapus lagu dari antrean...');
+      try {
+        const res = await fetch('/api/guilds/' + guildId + '/music/control', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'remove', value: idx })
+        });
+        const json = await res.json();
+        if (json.success) {
+          showToast('<i class="fa-solid fa-trash-can"></i> Lagu dihapus dari antrean.');
+          updateMusicUI(json);
+        }
+      } catch {}
+    }
+
+    // --- REAL-TIME SERVER-SENT EVENTS (SSE) STREAM ---
+    const guildId = '<%= guild.id %>';
+    let sseSource = null;
+
+    function initRealtimeStream() {
+      if (typeof EventSource === 'undefined') {
+        console.warn('Browser does not support EventSource, using polling fallback');
+        setInterval(pollMusicStatus, 3000);
+        setInterval(pollModCases, 5000);
+        return;
+      }
+
+      try {
+        if (sseSource) sseSource.close();
+        sseSource = new EventSource('/api/guilds/' + guildId + '/events');
+
+        sseSource.onopen = () => {
+          setLiveStatus(true);
+        };
+
+        sseSource.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            if (data.type === 'init') {
+              if (data.music) updateMusicUI(data.music);
+              if (data.cases) updateModCasesUI(data.cases);
+            } else if (data.type === 'music') {
+              updateMusicUI(data.music);
+            } else if (data.type === 'modCase') {
+              handleNewModCase(data.modCase);
+            }
+          } catch (e) {
+            console.error('SSE parse error:', e);
+          }
+        };
+
+        sseSource.onerror = () => {
+          setLiveStatus(false);
+          // Fallback poll on error
+          pollMusicStatus();
+        };
+      } catch (err) {
+        setLiveStatus(false);
+      }
+    }
+
+    function setLiveStatus(online) {
+      const musicBadge = document.getElementById('musicLiveBadge');
+      const logsBadge = document.getElementById('logsLiveBadge');
+      const dot = online 
+        ? '<span class="live-dot"></span> Real-Time Aktif' 
+        : '<span style="width:8px;height:8px;border-radius:50%;background:#eab308;display:inline-block;"></span> Menghubungkan...';
+      const color = online ? '#4ade80' : '#fde047';
+      const border = online ? 'rgba(34, 197, 94, 0.3)' : 'rgba(234, 179, 8, 0.3)';
+      const bg = online ? 'rgba(34, 197, 94, 0.15)' : 'rgba(234, 179, 8, 0.15)';
+
+      [musicBadge, logsBadge].forEach(b => {
+        if (b) {
+          b.innerHTML = dot;
+          b.style.color = color;
+          b.style.borderColor = border;
+          b.style.background = bg;
+        }
+      });
+    }
+
+    async function changeLiveVolume(val) {
+      document.getElementById('liveVolumeText').innerText = val + '%';
+      try {
+        await fetch('/api/guilds/' + guildId + '/music/control', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'volume', value: val })
+        });
+      } catch {}
+    }
+
+    async function pollMusicStatus() {
+      try {
+        const res = await fetch('/api/guilds/' + guildId + '/music/status');
+        const json = await res.json();
+        if (json.success) {
+          updateMusicUI(json);
+        }
+      } catch {}
+    }
+
+    async function pollModCases() {
+      try {
+        const res = await fetch('/api/guilds/' + guildId + '/mod-cases');
+        const json = await res.json();
+        if (json.success && json.cases) {
+          updateModCasesUI(json.cases);
+        }
+      } catch {}
+    }
+
+    function updateMusicUI(data) {
+      if (!data) return;
+      const noBox = document.getElementById('noMusicPlaying');
+      const actBox = document.getElementById('activeMusicPlaying');
+      if (data.currentSong) {
+        noBox.style.display = 'none';
+        actBox.style.display = 'block';
+        document.getElementById('musicTitle').innerText = data.currentSong.title || 'Lagu Tanpa Judul';
+        document.getElementById('musicThumb').src = data.currentSong.thumbnail || '';
+        document.getElementById('musicMeta').innerText = 'Durasi: ' + (data.currentSong.duration || 'Live') + ' • Diminta oleh: ' + (data.currentSong.requesterTag || 'Anggota') + ' • Mode: ' + (data.loopMode?.toUpperCase() || 'OFF');
+
+        // Status badge & equalizer
+        const badge = document.getElementById('playingStatusBadge');
+        const eq = document.getElementById('equalizerBox');
+        const btnPauseResume = document.getElementById('btnPauseResume');
+        isSongPaused = Boolean(data.paused);
+
+        if (data.paused) {
+          badge.innerHTML = '<i class="fa-solid fa-pause"></i> DIJEDA';
+          badge.style.color = '#fde047';
+          badge.style.background = 'rgba(234, 179, 8, 0.2)';
+          badge.style.borderColor = 'rgba(234, 179, 8, 0.35)';
+          if (btnPauseResume) btnPauseResume.innerHTML = '<i class="fa-solid fa-play"></i> Lanjut';
+          if (eq) eq.style.display = 'none';
+        } else {
+          badge.innerHTML = '<i class="fa-solid fa-play"></i> MEMUTAR';
+          badge.style.color = '#818cf8';
+          badge.style.background = 'rgba(88, 101, 242, 0.2)';
+          badge.style.borderColor = 'rgba(88, 101, 242, 0.35)';
+          if (btnPauseResume) btnPauseResume.innerHTML = '<i class="fa-solid fa-pause"></i> Jeda';
+          if (eq) eq.style.display = 'inline-flex';
+        }
+
+        // Loop mode button text
+        const btnLoop = document.getElementById('btnLoopToggle');
+        if (btnLoop) {
+          const lMode = (data.loopMode || 'off').toUpperCase();
+          btnLoop.innerHTML = '<i class="fa-solid fa-repeat"></i> Loop: ' + lMode;
+          if (lMode !== 'OFF') {
+            btnLoop.style.borderColor = '#818cf8';
+            btnLoop.style.color = '#a5b4fc';
+          } else {
+            btnLoop.style.borderColor = 'rgba(255,255,255,0.12)';
+            btnLoop.style.color = '#e2e8f0';
+          }
+        }
+
+        // Live volume slider
+        if (data.volume !== undefined) {
+          const vSlider = document.getElementById('liveVolumeSlider');
+          const vText = document.getElementById('liveVolumeText');
+          if (vSlider && document.activeElement !== vSlider) {
+            vSlider.value = data.volume;
+          }
+          if (vText) vText.innerText = data.volume + '%';
+        }
+
+        // Live Queue list with remove buttons
+        const qSection = document.getElementById('liveQueueSection');
+        const qList = document.getElementById('queueList');
+        const qCount = document.getElementById('queueCount');
+        if (data.queue && data.queue.length > 0) {
+          qSection.style.display = 'block';
+          qCount.innerText = data.queue.length;
+          qList.innerHTML = data.queue.map((t, idx) => `
+            <div class="queue-row">
+              <span style="color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 75%;">
+                <strong style="color: #818cf8; margin-right: 0.35rem;">#${idx + 1}</strong> ${escapeHtml(t.title)}
+              </span>
+              <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <span style="color: #94a3b8; font-size: 0.8rem;">${t.duration || 'Live'}</span>
+                <button type="button" onclick="removeQueueItem(${idx})" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #fca5a5; border-radius: 6px; padding: 3px 8px; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.3rem;">
+                  <i class="fa-solid fa-xmark"></i> Hapus
+                </button>
+              </div>
+            </div>
+          `).join('');
+        } else {
+          qSection.style.display = 'none';
+        }
+      } else {
+        noBox.style.display = 'block';
+        actBox.style.display = 'none';
+      }
+    }
+
+    function updateModCasesUI(cases) {
+      if (!Array.isArray(cases)) return;
+      const tbody = document.getElementById('logsTableBody');
+      const container = document.getElementById('logsTableContainer');
+      const noLogs = document.getElementById('noLogsMsg');
+
+      if (cases.length === 0) {
+        if (noLogs) noLogs.style.display = 'block';
+        if (container) container.style.display = 'none';
+        return;
+      }
+
+      if (noLogs) noLogs.style.display = 'none';
+      if (container) container.style.display = 'block';
+
+      tbody.innerHTML = cases.map(c => renderCaseRow(c)).join('');
+    }
+
+    function handleNewModCase(c) {
+      if (!c) return;
+      const tbody = document.getElementById('logsTableBody');
+      const container = document.getElementById('logsTableContainer');
+      const noLogs = document.getElementById('noLogsMsg');
+
+      if (noLogs) noLogs.style.display = 'none';
+      if (container) container.style.display = 'block';
+
+      if (document.getElementById('case-row-' + c.caseNumber)) return;
+
+      const temp = document.createElement('tbody');
+      temp.innerHTML = renderCaseRow(c, true);
+      const newTr = temp.firstElementChild;
+
+      if (tbody.firstChild) {
+        tbody.insertBefore(newTr, tbody.firstChild);
+      } else {
+        tbody.appendChild(newTr);
+      }
+
+      showToast('<i class="fa-solid fa-shield-halved"></i> Kasus Moderasi Baru: ' + (c.action || 'Tindakan') + ' terhadap ' + (c.targetTag || c.targetId));
+    }
+
+    function renderCaseRow(c, isNew = false) {
+      const dateStr = new Date(c.createdAt).toLocaleDateString('id-ID') + ' ' + new Date(c.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+      const actionClass = 'badge-' + (c.action || '').toLowerCase();
+      const newBadge = isNew ? ' <span style="font-size:0.65rem; background:#22c55e; color:#fff; padding:1px 5px; border-radius:3px; font-weight:700;">BARU</span>' : '';
+      const rowClass = isNew ? 'class="new-case-row"' : '';
+
+      return `
+        <tr id="case-row-${c.caseNumber}" ${rowClass}>
+          <td><strong>#${c.caseNumber}</strong>${newBadge}</td>
+          <td><span class="badge-action ${actionClass}">${escapeHtml(c.action)}</span></td>
+          <td><strong>${escapeHtml(c.targetTag || c.targetId)}</strong></td>
+          <td>${escapeHtml(c.moderatorTag || c.moderatorId)}</td>
+          <td>${escapeHtml(c.reason || '-')}</td>
+          <td>${dateStr}</td>
+        </tr>
+      `;
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    // Initialize Real-Time SSE Stream immediately on page load
+    initRealtimeStream();
+
+    // Fallback polling every 5s in case SSE is interrupted
+    setInterval(pollMusicStatus, 5000);
+    setInterval(pollModCases, 10000);
+  </script>
+</body>
+</html>

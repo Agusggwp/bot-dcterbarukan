@@ -1,0 +1,315 @@
+// Prisma Schema for Enterprise Discord Bot (MySQL Edition)
+// Multi-guild architecture, fully relational with constraints and indexes
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// 1. Guild Configuration
+model GuildConfig {
+  guildId              String   @id @db.VarChar(64)
+  prefix               String   @default("!") @db.VarChar(10)
+  language             String   @default("id") @db.VarChar(10)
+  modLogChannelId      String?  @db.VarChar(64)
+  adminRoleId          String?  @db.VarChar(64)
+  modRoleId            String?  @db.VarChar(64)
+  muteRoleId           String?  @db.VarChar(64)
+  antiSpamEnabled      Boolean  @default(true)
+  antiSpamThreshold    Int      @default(5)
+  antiSpamIntervalMs   Int      @default(3000)
+  antiRaidEnabled      Boolean  @default(false)
+  antiRaidThreshold    Int      @default(10)
+  antiRaidIntervalMs   Int      @default(10000)
+  mentionSpamThreshold Int      @default(5)
+  filterLinksEnabled   Boolean  @default(false)
+  allowedLinks         String?  @db.Text
+  antiSpamTrapEnabled  Boolean  @default(false)
+  antiSpamTrapChannelId String? @db.VarChar(64)
+  antiSpamTrapMessage  String?  @db.Text
+  musicDefaultVolume   Int      @default(80)
+  musicChannelId       String?  @db.VarChar(64)
+  musicDjRoleId        String?  @db.VarChar(64)
+  musicAutoLeave       Boolean  @default(true)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  welcomeConfig        WelcomeConfig?
+  levelConfig          LevelConfig?
+  moderationCases      ModerationCase[]
+  warnings             UserWarning[]
+  tickets              Ticket[]
+  levels               Level[]
+  economyAccounts      EconomyAccount[]
+  giveaways            Giveaway[]
+  reactionRoles        ReactionRole[]
+  auditLogs            AuditLog[]
+
+  @@index([guildId])
+}
+
+// 2. Welcome & Onboarding Configuration
+model WelcomeConfig {
+  guildId               String   @id @db.VarChar(64)
+  guild                 GuildConfig @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+  enabled               Boolean  @default(false)
+  channelId             String?  @db.VarChar(64)
+  message               String?  @db.Text
+  embedColor            String   @default("#5865F2") @db.VarChar(16)
+  dmEnabled             Boolean  @default(false)
+  dmMessage             String?  @db.Text
+  goodbyeEnabled        Boolean  @default(false)
+  goodbyeChannelId      String?  @db.VarChar(64)
+  goodbyeMessage        String?  @db.Text
+  autoRoleId            String?  @db.VarChar(64)
+  verificationEnabled   Boolean  @default(false)
+  verificationRoleId    String?  @db.VarChar(64)
+  verificationChannelId String?  @db.VarChar(64)
+  verificationMessage   String?  @db.Text
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
+
+// 3. Moderation Cases & Warnings
+model ModerationCase {
+  id           Int      @id @default(autoincrement())
+  guildId      String   @db.VarChar(64)
+  guild        GuildConfig @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+  caseNumber   Int
+  targetId     String   @db.VarChar(64)
+  targetTag    String?  @db.VarChar(100)
+  moderatorId  String   @db.VarChar(64)
+  moderatorTag String?  @db.VarChar(100)
+  action       String   @db.VarChar(32) // BAN, UNBAN, KICK, TIMEOUT, UNTIMEOUT, WARN, PURGE, LOCK, UNLOCK, NICK, MASSROLE
+  reason       String   @default("Tidak ada alasan yang diberikan.") @db.Text
+  duration     Int?     // Duration in seconds (e.g. for timeout)
+  metadata     String?  @db.Text
+  createdAt    DateTime @default(now())
+
+  @@unique([guildId, caseNumber])
+  @@index([guildId, targetId])
+  @@index([guildId, action])
+}
+
+model UserWarning {
+  id           Int      @id @default(autoincrement())
+  guildId      String   @db.VarChar(64)
+  guild        GuildConfig @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+  userId       String   @db.VarChar(64)
+  moderatorId  String   @db.VarChar(64)
+  reason       String   @db.Text
+  createdAt    DateTime @default(now())
+
+  @@index([guildId, userId])
+}
+
+// 4. Ticket Support System
+model Ticket {
+  id           String             @id @default(uuid()) @db.VarChar(64)
+  guildId      String             @db.VarChar(64)
+  guild        GuildConfig        @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+  channelId    String?            @unique @db.VarChar(64)
+  ticketNumber Int
+  creatorId    String             @db.VarChar(64)
+  claimedById  String?            @db.VarChar(64)
+  category     String             @default("General Support") @db.VarChar(100)
+  status       String             @default("OPEN") @db.VarChar(32) // OPEN, CLOSED, REOPENED
+  subject      String?            @db.Text
+  closeReason  String?            @db.Text
+  closedAt     DateTime?
+  autoCloseAt  DateTime?
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+
+  participants TicketParticipant[]
+  transcript   TicketTranscript?
+
+  @@unique([guildId, ticketNumber])
+  @@index([guildId, creatorId])
+  @@index([guildId, status])
+}
+
+model TicketParticipant {
+  id       Int      @id @default(autoincrement())
+  ticketId String   @db.VarChar(64)
+  ticket   Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  userId   String   @db.VarChar(64)
+  role     String   @default("PARTICIPANT") @db.VarChar(32) // CREATOR, SUPPORT, PARTICIPANT
+  joinedAt DateTime @default(now())
+
+  @@unique([ticketId, userId])
+  @@index([ticketId])
+}
+
+model TicketTranscript {
+  id        Int      @id @default(autoincrement())
+  ticketId  String   @unique @db.VarChar(64)
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  content   String   @db.LongText // Supports large conversation transcripts in MySQL
+  format    String   @default("TXT") @db.VarChar(16) // TXT or HTML
+  createdAt DateTime @default(now())
+}
+
+// 5. Leveling & XP System
+model LevelConfig {
+  guildId               String   @id @db.VarChar(64)
+  guild                 GuildConfig @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+  enabled               Boolean  @default(true)
+  xpRate                Float    @default(1.0)
+  cooldownSeconds       Int      @default(60)
+  announcementChannelId String?  @db.VarChar(64)
+  ignoredChannels       String?  @db.Text
+  roleRewards           String?  @db.Text
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
+
+model Level {
+  id        Int      @id @default(autoincrement())
+  guildId   String   @db.VarChar(64)
+  guild     GuildConfig @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+  userId    String   @db.VarChar(64)
+  xp        Int      @default(0)
+  level     Int      @default(0)
+  lastXpAt  DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([guildId, userId])
+  @@index([guildId, xp(sort: Desc)])
+}
+
+model XPEvent {
+  id        Int      @id @default(autoincrement())
+  guildId   String   @db.VarChar(64)
+  userId    String   @db.VarChar(64)
+  xpAmount  Int
+  channelId String   @db.VarChar(64)
+  createdAt DateTime @default(now())
+
+  @@index([guildId, userId])
+}
+
+// 6. Economy System
+model EconomyAccount {
+  id         Int      @id @default(autoincrement())
+  guildId    String   @db.VarChar(64)
+  guild      GuildConfig @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+  userId     String   @db.VarChar(64)
+  wallet     BigInt   @default(0)
+  bank       BigInt   @default(0)
+  lastDaily  DateTime?
+  lastWeekly DateTime?
+  lastWork   DateTime?
+  inventory  String?  @db.Text
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([guildId, userId])
+  @@index([guildId, wallet(sort: Desc)])
+}
+
+model EconomyTransaction {
+  id          Int      @id @default(autoincrement())
+  guildId     String   @db.VarChar(64)
+  senderId    String?  @db.VarChar(64)
+  receiverId  String?  @db.VarChar(64)
+  amount      BigInt
+  type        String   @db.VarChar(32) // DAILY, WEEKLY, WORK, TRANSFER, BUY, SHOP
+  description String?  @db.Text
+  createdAt   DateTime @default(now())
+
+  @@index([guildId, senderId])
+  @@index([guildId, receiverId])
+}
+
+// 7. Giveaway System
+model Giveaway {
+  id             String          @id @default(uuid()) @db.VarChar(64)
+  guildId        String          @db.VarChar(64)
+  guild          GuildConfig     @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+  channelId      String          @db.VarChar(64)
+  messageId      String          @unique @db.VarChar(64)
+  prize          String          @db.VarChar(255)
+  winnerCount    Int             @default(1)
+  requiredRoleId String?         @db.VarChar(64)
+  hostedById     String          @db.VarChar(64)
+  endsAt         DateTime
+  ended          Boolean         @default(false)
+  winners        String?         @db.Text
+  createdAt      DateTime        @default(now())
+
+  entries        GiveawayEntry[]
+
+  @@index([guildId, ended, endsAt])
+}
+
+model GiveawayEntry {
+  id         Int      @id @default(autoincrement())
+  giveawayId String   @db.VarChar(64)
+  giveaway   Giveaway @relation(fields: [giveawayId], references: [id], onDelete: Cascade)
+  userId     String   @db.VarChar(64)
+  createdAt  DateTime @default(now())
+
+  @@unique([giveawayId, userId])
+  @@index([giveawayId])
+}
+
+// 8. Reminders
+model Reminder {
+  id           Int      @id @default(autoincrement())
+  userId       String   @db.VarChar(64)
+  channelId    String   @db.VarChar(64)
+  guildId      String?  @db.VarChar(64)
+  reminderText String   @db.Text
+  dueAt        DateTime
+  completed    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  @@index([completed, dueAt])
+  @@index([userId])
+}
+
+// 9. Reaction Roles
+model ReactionRole {
+  id        Int      @id @default(autoincrement())
+  guildId   String   @db.VarChar(64)
+  guild     GuildConfig @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+  channelId String   @db.VarChar(64)
+  messageId String   @db.VarChar(64)
+  emoji     String   @db.VarChar(32)
+  roleId    String   @db.VarChar(64)
+  createdAt DateTime @default(now())
+
+  @@unique([messageId, emoji])
+  @@index([guildId])
+}
+
+// 10. Audit Logs
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  guildId   String   @db.VarChar(64)
+  guild     GuildConfig @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+  action    String   @db.VarChar(64)
+  actorId   String?  @db.VarChar(64)
+  targetId  String?  @db.VarChar(64)
+  details   String?  @db.Text
+  createdAt DateTime @default(now())
+
+  @@index([guildId, action])
+  @@index([guildId, createdAt(sort: Desc)])
+}
+
+// 11. Dashboard Session Store
+model DashboardSession {
+  id        String   @id @db.VarChar(64)
+  sid       String   @unique @db.VarChar(128)
+  data      String   @db.Text
+  expiresAt DateTime
+
+  @@index([expiresAt])
+}

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pilih Server - Enterprise Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+      background-color: #080c14;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.22) 0%, transparent 45%),
+        radial-gradient(circle at 85% 20%, rgba(217, 70, 239, 0.18) 0%, transparent 42%),
+        radial-gradient(circle at 50% 60%, rgba(56, 189, 248, 0.12) 0%, transparent 50%),
+        radial-gradient(circle at 80% 85%, rgba(139, 92, 246, 0.16) 0%, transparent 45%);
+      background-attachment: fixed;
+      background-size: cover;
+      color: #f1f5f9;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 1.15rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(11, 15, 25, 0.65);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+    }
+    .logo { font-size: 1.25rem; font-weight: 700; color: #818cf8; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.65rem 1.35rem;
+      border-radius: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.95), rgba(139, 92, 246, 0.9));
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 8px 24px rgba(99, 102, 241, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, rgba(79, 70, 229, 0.98), rgba(124, 58, 237, 0.95));
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(99, 102, 241, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    }
+    .btn-success {
+      background: linear-gradient(135deg, rgba(34, 197, 94, 0.9), rgba(16, 185, 129, 0.85));
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 8px 24px rgba(34, 197, 94, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
+    .btn-success:hover {
+      background: linear-gradient(135deg, rgba(22, 163, 74, 0.95), rgba(5, 150, 105, 0.9));
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(34, 197, 94, 0.5);
+    }
+    .btn-outline {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #f1f5f9;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    }
+    .btn-outline:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .container {
+      max-width: 1040px;
+      margin: 3rem auto;
+      padding: 0 1.5rem;
+      flex: 1;
+      width: 100%;
+    }
+    h2 { font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; letter-spacing: -0.3px; }
+    p.sub { color: #94a3b8; margin-bottom: 2.25rem; font-size: 1rem; }
+
+    .guild-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 1.5rem;
+    }
+    .guild-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(18px) saturate(160%);
+      -webkit-backdrop-filter: blur(18px) saturate(160%);
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      border-radius: 20px;
+      padding: 1.85rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .guild-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(99, 102, 241, 0.45);
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.35), 0 0 20px rgba(99, 102, 241, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    }
+    .guild-icon {
+      width: 78px;
+      height: 78px;
+      border-radius: 22px; /* Apple squircle */
+      margin-bottom: 1.15rem;
+      object-fit: cover;
+      background: rgba(15, 23, 42, 0.7);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      border: 2px solid rgba(255, 255, 255, 0.18);
+    }
+    .guild-name {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 250px;
+      color: #ffffff;
+    }
+    .guild-status {
+      font-size: 0.82rem;
+      margin-bottom: 1.35rem;
+      color: #94a3b8;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .guild-status.active { color: #4ade80; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo"><i class="fa-solid fa-shield-halved" style="color: #6366f1;"></i> Discord Enterprise Dashboard</div>
+    <div>
+      <span style="margin-right: 1rem;"><i class="fa-regular fa-user" style="color: #94a3b8; margin-right: 0.35rem;"></i><%= user.username %></span>
+      <a href="/auth/logout" class="btn btn-outline"><i class="fa-solid fa-arrow-right-from-bracket" style="margin-right: 0.35rem;"></i>Keluar</a>
+    </div>
+  </header>
+
+  <div class="container">
+    <h2>Pilih Server untuk Dikelola</h2>
+    <p class="sub">Hanya server tempat Anda memiliki izin Administrator yang ditampilkan di bawah ini.</p>
+
+    <div class="guild-grid">
+      <% if (guilds.length === 0) { %>
+        <p style="grid-column: 1 / -1; text-align: center; color: #94a3b8; padding: 2rem;">
+          Tidak ada server yang memenuhi izin Administrator ditemukan untuk akun Anda.
+        </p>
+      <% } else { %>
+        <% guilds.forEach(function(guild) { %>
+          <div class="guild-card">
+            <img class="guild-icon" src="<%= guild.iconUrl %>" alt="<%= guild.name %>" />
+            <div class="guild-name"><%= guild.name %></div>
+            <% if (guild.botInGuild) { %>
+              <div class="guild-status active"><i class="fa-solid fa-circle" style="font-size: 0.6rem;"></i> Bot Terhubung</div>
+              <a href="/guilds/<%= guild.id %>" class="btn btn-primary" style="width: 100%;"><i class="fa-solid fa-sliders" style="margin-right: 0.4rem;"></i>Kelola Pengaturan</a>
+            <% } else { %>
+              <div class="guild-status"><i class="fa-regular fa-circle" style="font-size: 0.6rem;"></i> Bot Belum Ditambahkan</div>
+              <a href="https://discord.com/api/oauth2/authorize?client_id=<%= botClientId %>&guild_id=<%= guild.id %>&permissions=8&scope=bot%20applications.commands" target="_blank" class="btn btn-success" style="width: 100%;"><i class="fa-solid fa-plus" style="margin-right: 0.4rem;"></i>Undang Bot</a>
+            <% } %>
+          </div>
+        <% }); %>
+      <% } %>
+    </div>
+  </div>
+</body>
+</html>
